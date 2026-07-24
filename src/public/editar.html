@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SZL-BOT - Editar Embed por ID</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glow-bg"></div>
+  <div class="glow-bg-secondary"></div>
+  
+  <header class="app-header">
+    <div class="logo-area">
+      <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 12px;">
+        <div class="bot-status-indicator"></div>
+        <h1>SZL-BOT <span>Dashboard</span></h1>
+      </a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <a id="backToServerLink" href="/" class="secondary-btn" style="text-decoration: none; font-weight: 600;">⬅ Voltar ao Painel</a>
+      <button type="button" id="openSettingsModalBtn" class="settings-gear-btn" title="Configurações do Servidor">
+        <svg class="gear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Configurações</span>
+      </button>
+      <div class="user-profile-header hidden" id="userProfile">
+        <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+        <span id="userTag" class="user-tag">Carregando...</span>
+        <a href="/logout" class="logout-btn">Sair</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-grid">
+    <!-- Editor de Embed por ID (Painel Esquerdo) -->
+    <section class="editor-section card-blur">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+        <h2 class="section-title" style="margin: 0; color: var(--cyan-color);">✏️ Editar Embed por ID - <span id="selectedGuildName" style="color: #ffffff;">...</span></h2>
+        <a id="goToCreateBtn" href="#" class="secondary-btn" style="text-decoration: none; font-size: 0.85rem; padding: 8px 14px; color: var(--accent-color); border-color: rgba(99, 102, 241, 0.3); background: rgba(99, 102, 241, 0.08);">
+          🚀 Ir para Criar Embed ➔
+        </a>
+      </div>
+
+      <!-- Caixa de Busca de Mensagem por ID -->
+      <div id="editSearchBoxCard" style="background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.3); padding: 18px 20px; border-radius: 12px; margin-bottom: 20px;">
+        <label for="fetchMessageId" style="font-size: 0.85rem; font-weight: 700; color: var(--cyan-color); text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 8px;">
+          Cole o ID da Mensagem do Discord para Carregar e Editar:
+        </label>
+        <div style="display: flex; gap: 10px;">
+          <input type="text" id="fetchMessageId" placeholder="ID da mensagem do Discord (ex: 1234567890123456789)..." style="flex-grow: 1; background: rgba(8, 9, 12, 0.9); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; color: white; font-size: 0.95rem;">
+          <button type="button" id="fetchEmbedBtn" class="secondary-btn" style="background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%); border: none; color: white; font-weight: 700; padding: 10px 20px; border-radius: 8px; cursor: pointer; white-space: nowrap;">
+            ⚡ Carregar Embed
+          </button>
+        </div>
+      </div>
+
+      <!-- Banner de Estado de Carregamento/Edição -->
+      <div id="editingBanner" class="hidden" style="background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.4); padding: 14px 18px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 1.4rem;">✏️</span>
+          <div>
+            <strong style="color: #ffffff; font-size: 0.95rem;">Embed Carregado com Sucesso!</strong>
+            <div id="editingInfoText" style="font-size: 0.85rem; color: var(--cyan-color);">Mensagem ID: ... no canal ...</div>
+          </div>
+        </div>
+      </div>
+
+      <form id="embedForm" class="editor-form">
+        <div class="form-group">
+          <label for="embedTitle">Título do Embed</label>
+          <input type="text" id="embedTitle" placeholder="Digite o título do aviso..." maxlength="256">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="embedColor">Cor Lateral</label>
+            <div class="color-picker-wrapper">
+              <input type="color" id="embedColor" value="#06b6d4">
+              <span id="colorHexText">#06b6d4</span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Presets Discord</label>
+            <div class="presets-container">
+              <button type="button" class="preset-btn" data-color="#6366f1" style="background-color: #6366f1;" title="Indigo/SZL"></button>
+              <button type="button" class="preset-btn" data-color="#06b6d4" style="background-color: #06b6d4;" title="Cyan/Tech"></button>
+              <button type="button" class="preset-btn" data-color="#10b981" style="background-color: #10b981;" title="Emerald/Success"></button>
+              <button type="button" class="preset-btn" data-color="#f43f5e" style="background-color: #f43f5e;" title="Rose/Danger"></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="embedDescription">Descrição / Mensagem</label>
+          <textarea id="embedDescription" rows="6" placeholder="Escreva o corpo da mensagem..." maxlength="4096"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="embedThumbnail">URL da Miniatura (Thumbnail - Canto Superior)</label>
+          <input type="url" id="embedThumbnail" placeholder="https://exemplo.com/icone.png">
+        </div>
+
+        <div class="form-group">
+          <label for="embedImage">URL da Imagem Principal (Corpo do Embed)</label>
+          <input type="url" id="embedImage" placeholder="https://exemplo.com/banner-grande.png">
+        </div>
+
+        <div class="form-group">
+          <label for="embedFooter">Texto de Rodapé (Footer)</label>
+          <input type="text" id="embedFooter" placeholder="Texto que aparecerá no rodapé..." maxlength="2048">
+        </div>
+
+        <!-- Seção de Campos Dinâmicos -->
+        <div class="fields-section">
+          <div class="fields-header">
+            <h3>Campos Adicionais (Fields)</h3>
+            <button type="button" id="addFieldBtn" class="secondary-btn" style="font-size: 0.8rem; padding: 6px 12px;">+ Adicionar Campo</button>
+          </div>
+          <div id="fieldsContainer" class="fields-container">
+            <!-- Os campos dinâmicos aparecem aqui -->
+          </div>
+        </div>
+
+        <!-- Seção de Botões de Link (URL Action Row) -->
+        <div class="buttons-section" style="border-top: 1px solid var(--border-color); margin-top: 24px; padding-top: 20px;">
+          <div class="buttons-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h3 style="font-family: var(--font-title); font-size: 1.1rem; font-weight: 700; color: #ffffff;">🔗 Botões de Link (Action Row)</h3>
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Adicione botões clicáveis com links externos ao seu aviso.</span>
+            </div>
+            <button type="button" id="addButtonBtn" class="secondary-btn" style="font-size: 0.8rem; padding: 6px 12px; border-color: rgba(6, 182, 212, 0.4); color: var(--cyan-color);">+ Adicionar Botão</button>
+          </div>
+          <div id="buttonsContainer" class="buttons-container" style="display: flex; flex-direction: column; gap: 12px;">
+            <!-- Os botões de link dinâmicos aparecem aqui -->
+          </div>
+        </div>
+
+        <!-- Seção de Mencionar Cargo -->
+        <div class="role-mention-section" style="border-top: 1px solid var(--border-color); margin-top: 24px; padding-top: 20px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div>
+              <h3 style="font-family: var(--font-title); font-size: 1.1rem; font-weight: 700; color: #ffffff;">🏷️ Mencionar Cargo / Notificação</h3>
+              <span style="font-size: 0.8rem; color: var(--text-secondary);">Marque um cargo, @everyone ou @here ao salvar esta edição.</span>
+            </div>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input type="checkbox" id="toggleRoleMention" style="accent-color: var(--cyan-color); width: 18px; height: 18px; cursor: pointer;">
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--cyan-color);">Mencionar Cargo</span>
+            </label>
+          </div>
+
+          <div id="roleSelectWrapper" class="hidden" style="background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.2); padding: 14px 18px; border-radius: 12px; margin-top: 10px;">
+            <label for="roleSelect" style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); display: block; margin-bottom: 8px;">
+              Selecione o Cargo a ser Marcado:
+            </label>
+            <select id="roleSelect" style="width: 100%; background: rgba(8, 9, 12, 0.9); border: 1px solid var(--border-color); border-radius: 8px; padding: 10px 14px; color: white; font-size: 0.95rem; cursor: pointer;">
+              <option value="">-- Selecione um Cargo --</option>
+              <option value="@everyone">📢 @everyone (Notificar todos no servidor)</option>
+              <option value="@here">🟢 @here (Notificar membros online)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" id="sendBtn" class="primary-btn" style="width: 100%; margin-top: 24px; background: linear-gradient(135deg, #06b6d4 0%, #2563eb 100%);">
+          <span>💾 Salvar e Editar Mensagem no Discord</span>
+        </button>
+      </form>
+    </section>
+
+    <!-- Visualização em Tempo Real (Painel Direito) -->
+    <section class="preview-section">
+      <h2 class="section-title">👁️ Visualização em Tempo Real (Discord Dark Mode)</h2>
+      
+      <div class="discord-chat-container">
+        <div class="discord-message">
+          <div class="discord-avatar-container">
+            <div class="discord-avatar">S</div>
+          </div>
+          <div class="discord-message-content">
+            <div class="discord-user-header">
+              <span class="discord-username">SZL-BOT</span>
+              <span class="discord-bot-tag">BOT</span>
+              <span id="discordLiveTimestamp" class="discord-timestamp">Hoje às 12:00</span>
+            </div>
+            
+            <div id="discordEmbedPreview" class="discord-embed" style="border-left-color: #06b6d4;">
+              <div class="discord-embed-inner">
+                <div class="discord-embed-main">
+                  <div class="discord-embed-text">
+                    <div id="previewTitle" class="discord-embed-title hidden">Título do Embed</div>
+                    <div id="previewDescription" class="discord-embed-description">A descrição do embed aparecerá aqui conforme você edita...</div>
+                    <div id="previewFields" class="discord-embed-fields"></div>
+                  </div>
+                  <div class="discord-embed-thumbnail-container">
+                    <img id="previewThumbnailImg" src="" class="discord-embed-thumbnail hidden" alt="Miniatura">
+                  </div>
+                </div>
+                <img id="previewImageImg" src="" class="discord-embed-image hidden" alt="Imagem Principal">
+                <div id="previewFooter" class="discord-embed-footer hidden">Texto de rodapé</div>
+              </div>
+            </div>
+
+            <!-- Pré-visualização dos Botões de Link (Discord Action Row) -->
+            <div id="previewButtonsContainer" class="discord-buttons-preview hidden" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; max-width: 520px;"></div>
+
+            <!-- Pré-visualização da Menção de Cargo (Abaixo do Embed) -->
+            <div id="previewRoleMention" class="discord-role-mention-preview hidden" style="margin-top: 10px;">
+              <span id="previewRoleTag" style="background: rgba(88, 101, 242, 0.18); color: #c9cdfb; border-radius: 3px; padding: 3px 7px; font-weight: 500; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 4px;">
+                @Cargo
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal de Configurações -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-card card-blur">
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <svg class="gear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: var(--accent-color);">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <h3>Configurações do Servidor</h3>
+        </div>
+        <button type="button" id="closeSettingsModalBtn" class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="configForm" class="modal-body-form">
+        <!-- ID Canal Principal -->
+        <div class="form-group">
+          <label for="channelSelect">ID do Canal de Avisos Principal</label>
+          <input type="text" id="channelSelect" placeholder="Digite o ID do canal principal (ex: 1229042...)" required>
+          <span id="channelNameText" class="channel-status-text"></span>
+        </div>
+
+        <!-- ID Canal Sugestões -->
+        <div class="form-group">
+          <label for="suggestionChannelId">ID do Canal de Sugestões (Opcional)</label>
+          <input type="text" id="suggestionChannelId" placeholder="Digite o ID do canal de sugestões (ex: 1229042...)">
+          <span id="suggestionChannelNameText" class="channel-status-text"></span>
+        </div>
+
+        <!-- Repositório GitHub -->
+        <div class="form-group">
+          <label for="githubRepo">Repositório GitHub do Servidor (dono/repositorio)</label>
+          <input type="text" id="githubRepo" placeholder="ex: szl-dev/projeto">
+          <span class="input-help-text">Exibe estrelas e issues do repositório no status do bot</span>
+        </div>
+
+        <!-- Opção de Trocar Status do Bot -->
+        <div class="form-group">
+          <label for="botStatusSelect">Status do Bot (Presença no Discord)</label>
+          <select id="botStatusSelect" class="custom-select-input">
+            <option value="online">🟢 Online (Ativo)</option>
+            <option value="idle">🌙 Ausente (Idle)</option>
+            <option value="dnd">🔴 Ocupado / Não Perturbe (DND)</option>
+            <option value="invisible">⚪ Invisível (Offline)</option>
+          </select>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" id="cancelSettingsBtn" class="secondary-btn">Cancelar</button>
+          <button type="submit" id="saveConfigBtn" class="primary-btn">
+            <span>💾 Salvar Configurações</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="notification" class="notification hidden">
+    <span id="notificationMsg">Mensagem editada com sucesso!</span>
+  </div>
+
+  <script src="settingsModal.js"></script>
+  <script src="editar.js"></script>
+</body>
+</html>

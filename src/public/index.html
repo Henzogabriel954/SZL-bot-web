@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SZL-BOT - Seletor de Servidores</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glow-bg"></div>
+  <div class="glow-bg-secondary"></div>
+
+  <header class="app-header">
+    <div class="logo-area">
+      <div class="bot-status-indicator"></div>
+      <h1>SZL-BOT <span>Dashboard</span></h1>
+    </div>
+    
+    <div class="user-profile-header hidden" id="userProfile" title="Perfil do Usuário">
+      <img id="userAvatar" class="user-avatar" src="" alt="Avatar">
+      <span id="userTag" class="user-tag">Carregando...</span>
+      <a href="/logout" class="logout-btn">Sair</a>
+    </div>
+  </header>
+
+  <main class="server-selection-container">
+    <h2 class="hub-title">Selecione um Servidor</h2>
+    <p class="hub-subtitle">Aqui estão listados os servidores onde você tem permissões de Administrador e o bot está presente. Escolha um para gerenciar.</p>
+
+    <!-- Lista de Servidores -->
+    <div id="serversGrid" class="servers-grid">
+      <!-- Gerado via JavaScript -->
+      <div style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); padding: 40px;">
+        <span class="bot-status-indicator" style="display: inline-block; margin-right: 8px;"></span>
+        Buscando seus servidores no Discord...
+      </div>
+    </div>
+  </main>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

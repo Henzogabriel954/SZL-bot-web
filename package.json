@@ -1,0 +1,37 @@
+{
+  "name": "szl-bot",
+  "version": "1.0.0",
+  "description": "Discord Bot for Programming Servers with Announcement Dashboard, Suggestions and Code Reviews",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "commands:deploy": "node src/deploy-commands.js",
+    "prisma:generate": "node scripts/run-prisma.js generate",
+    "prisma:migrate": "node scripts/run-prisma.js migrate dev"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "programming",
+    "embeds",
+    "announcements",
+    "suggestions",
+    "prisma"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.16.0",
+    "axios": "^1.18.1",
+    "cookie-session": "^2.1.1",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "prisma": "^5.16.0"
+  }
+}

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SZL-BOT - Painel de Sugestões</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  
+  <style>
+    /* Estilos adicionais específicos para os cards e modais de sugestão */
+    .suggestions-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .suggestion-card {
+      background: rgba(18, 18, 28, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s ease;
+    }
+
+    .suggestion-card:hover {
+      border-color: rgba(139, 92, 246, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .suggestion-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4px;
+    }
+
+    .suggestion-card.status-PENDING::before { background: #f59e0b; }
+    .suggestion-card.status-APPROVED::before { background: #10b981; }
+    .suggestion-card.status-REJECTED::before { background: #ef4444; }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .author-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .author-avatar {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #8b5cf6, #06b6d4);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .status-badge {
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .status-badge.PENDING {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .status-badge.APPROVED {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge.REJECTED {
+      background: rgba(239, 68, 68, 0.15);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .suggestion-content-box {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace, monospace;
+      font-size: 0.95rem;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .vote-bar-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+    }
+
+    .vote-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .vote-bar-bg {
+      height: 8px;
+      background: rgba(239, 68, 68, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .vote-bar-fill {
+      height: 100%;
+      background: #10b981;
+      transition: width 0.4s ease;
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .btn-action {
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-approve {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+
+    .btn-approve:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-reject {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
+    }
+
+    .btn-reject:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+    }
+
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-box {
+      background: rgba(18, 18, 28, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-box i {
+      font-size: 1.8rem;
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-val {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body class="dashboard-body">
+  <div class="glow-bg"></div>
+  <div class="glow-bg-secondary"></div>
+  
+  <div class="layout-container">
+    <!-- Sidebar Lateral -->
+    <aside class="sidebar">
+      <div class="sidebar-server-header">
+        <div class="server-avatar-wrapper">
+          <div class="server-icon-placeholder">💡</div>
+        </div>
+        <div class="server-info">
+          <h2 class="server-title">SZL-BOT Devs</h2>
+          <span class="server-badge">Painel de Sugestões</span>
+        </div>
+      </div>
+
+      <div class="sidebar-divider"></div>
+
+      <!-- Menu de Navegação da Sidebar (HAMBURGER MENU DRAWER) -->
+      <nav class="sidebar-nav">
+        <button type="button" class="sidebar-item active" data-tab="PENDING" id="tabPending">
+          <span class="nav-icon">💡</span>
+          <span>Sugestões Em Aberto</span>
+          <span class="badge-count" id="countPending" style="margin-left: auto; background: rgba(245,158,11,0.2); color: #f59e0b; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">0</span>
+        </button>
+
+        <button type="button" class="sidebar-item" data-tab="APPROVED" id="tabApproved">
+          <span class="nav-icon">✅</span>
+          <span>Aprovadas</span>
+          <span class="badge-count" id="countApproved" style="margin-left: auto; background: rgba(16,185,129,0.2); color: #10b981; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">0</span>
+        </button>
+
+        <button type="button" class="sidebar-item" data-tab="REJECTED" id="tabRejected">
+          <span class="nav-icon">❌</span>
+          <span>Rejeitadas</span>
+          <span class="badge-count" id="countRejected" style="margin-left: auto; background: rgba(239,68,68,0.2); color: #ef4444; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">0</span>
+        </button>
+
+        <button type="button" class="sidebar-item" data-tab="ALL" id="tabAll">
+          <span class="nav-icon">📋</span>
+          <span>Todas as Sugestões</span>
+          <span class="badge-count" id="countTotal" style="margin-left: auto; background: rgba(139,92,246,0.2); color: #8b5cf6; padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 700;">0</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="/server" id="btnBackToServer" class="sidebar-back-btn">
+          <span>⬅ Voltar ao Painel do Servidor</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Área Principal -->
+    <div class="main-wrapper">
+      <header class="app-header dashboard-header">
+        <div class="logo-area">
+          <button type="button" id="mobileMenuToggle" class="hamburger-btn" title="Abrir Menu Lateral Hambúrguer">
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+          <div class="bot-status-indicator"></div>
+          <h1>SZL-BOT <span>Painel de Sugestões</span></h1>
+        </div>
+
+        <div class="header-right-actions">
+          <button type="button" id="openSettingsModalBtn" class="settings-gear-btn" title="Configurações do Servidor">
+            <svg class="gear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Configurações</span>
+          </button>
+          <div class="user-profile-header" id="userProfile">
+            <span class="user-tag" id="displayAdminNameHeader">Moderador</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="dashboard-main-content">
+        <!-- Dashboard Stats Summary -->
+        <div class="stats-bar">
+          <div class="stat-box">
+            <i class="fa-solid fa-hourglass-half" style="color: #f59e0b;"></i>
+            <div class="stat-info">
+              <span class="stat-val" id="statPendingCount">0</span>
+              <span class="stat-lbl">Em Aberto</span>
+            </div>
+          </div>
+          <div class="stat-box">
+            <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
+            <div class="stat-info">
+              <span class="stat-val" id="statApprovedCount">0</span>
+              <span class="stat-lbl">Aprovadas</span>
+            </div>
+          </div>
+          <div class="stat-box">
+            <i class="fa-solid fa-circle-xmark" style="color: #ef4444;"></i>
+            <div class="stat-info">
+              <span class="stat-val" id="statRejectedCount">0</span>
+              <span class="stat-lbl">Rejeitadas</span>
+            </div>
+          </div>
+          <div class="stat-box">
+            <i class="fa-solid fa-check-to-slot" style="color: #8b5cf6;"></i>
+            <div class="stat-info">
+              <span class="stat-val" id="statTotalVotesCount">0</span>
+              <span class="stat-lbl">Votos Devs</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section Header -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
+          <div>
+            <h2 id="pageTitle" style="font-family: 'Outfit', sans-serif; font-size: 1.5rem;">💡 Sugestões Em Aberto</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem;">Analise e aprove ou rejeite propostas enviadas via <code>/sugestao</code></p>
+          </div>
+          
+          <button type="button" id="btnRefreshSuggestions" title="Atualizar Lista" style="background: transparent; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; padding: 0.5rem; transition: transform 0.3s ease;">
+            🔄
+          </button>
+        </div>
+
+        <!-- Grid Container de Sugestões -->
+        <div id="suggestionsContainer" class="suggestions-grid">
+          <div style="text-align: center; color: var(--text-secondary); padding: 40px;">
+            Carregando sugestões em aberto...
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação para Aprovação / Rejeição -->
+  <div id="actionModal" class="modal-overlay hidden">
+    <div class="modal-card card-blur" style="max-width: 500px;">
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <h3 id="modalTitle">Avaliar Sugestão</h3>
+        </div>
+        <button type="button" id="closeActionModalBtn" class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="actionForm" class="modal-body-form">
+        <input type="hidden" id="modalSuggestionId">
+        <input type="hidden" id="modalActionType">
+
+        <div style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px; padding: 0.85rem; margin-bottom: 1rem;">
+          <p style="font-size: 0.85rem; color: var(--text-secondary);" id="modalAuthorTag">@autor</p>
+          <p style="font-size: 0.9rem; color: #fff; margin-top: 0.4rem;" id="modalContentPreview">...</p>
+        </div>
+
+        <div class="form-group">
+          <label for="inputAdminName">Seu Nome (Moderador / Admin)</label>
+          <input type="text" id="inputAdminName" placeholder="Ex: Admin Dev" required readonly style="background: rgba(0,0,0,0.4); color: #9ca3af; cursor: not-allowed;">
+        </div>
+
+        <div class="form-group">
+          <label for="inputAdminNotes">Motivo / Observação (Opcional)</label>
+          <textarea id="inputAdminNotes" rows="3" placeholder="Ex: Proposta aprovada! Vamos integrar na próxima versão." style="background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.75rem; color: #fff; width: 100%; font-family: inherit;"></textarea>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" id="cancelActionBtn" class="secondary-btn">Cancelar</button>
+          <button type="submit" id="confirmActionBtn" class="primary-btn">
+            <span>Confirmar Decisão</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Configurações -->
+  <div id="settingsModal" class="modal-overlay hidden">
+    <div class="modal-card card-blur">
+      <div class="modal-header">
+        <div class="modal-title-area">
+          <svg class="gear-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 22px; height: 22px; color: var(--accent-color);">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <h3>Configurações do Servidor</h3>
+        </div>
+        <button type="button" id="closeSettingsModalBtn" class="modal-close-btn">&times;</button>
+      </div>
+
+      <form id="configForm" class="modal-body-form">
+        <!-- ID Canal Principal -->
+        <div class="form-group">
+          <label for="channelSelect">ID do Canal de Avisos Principal</label>
+          <input type="text" id="channelSelect" placeholder="Digite o ID do canal principal (ex: 1229042...)" required>
+          <span id="channelNameText" class="channel-status-text"></span>
+        </div>
+
+        <!-- ID Canal Sugestões -->
+        <div class="form-group">
+          <label for="suggestionChannelId">ID do Canal de Sugestões (Opcional)</label>
+          <input type="text" id="suggestionChannelId" placeholder="Digite o ID do canal de sugestões (ex: 1229042...)">
+          <span id="suggestionChannelNameText" class="channel-status-text"></span>
+        </div>
+
+        <!-- Repositório GitHub -->
+        <div class="form-group">
+          <label for="githubRepo">Repositório GitHub do Servidor (dono/repositorio)</label>
+          <input type="text" id="githubRepo" placeholder="ex: szl-dev/projeto">
+          <span class="input-help-text">Exibe estrelas e issues do repositório no status do bot</span>
+        </div>
+
+        <!-- Opção de Trocar Status do Bot -->
+        <div class="form-group">
+          <label for="botStatusSelect">Status do Bot (Presença no Discord)</label>
+          <select id="botStatusSelect" class="custom-select-input">
+            <option value="online">🟢 Online (Ativo)</option>
+            <option value="idle">🌙 Ausente (Idle)</option>
+            <option value="dnd">🔴 Ocupado / Não Perturbe (DND)</option>
+            <option value="invisible">⚪ Invisível (Offline)</option>
+          </select>
+        </div>
+
+        <div class="modal-footer-actions">
+          <button type="button" id="cancelSettingsBtn" class="secondary-btn">Cancelar</button>
+          <button type="submit" id="saveConfigBtn" class="primary-btn">
+            <span>💾 Salvar Configurações</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="notification" class="notification hidden">
+    <span id="notificationMsg">Configurações salvas com sucesso!</span>
+  </div>
+
+  <script src="settingsModal.js"></script>
+  <script src="sugestoes.js"></script>
+</body>
+</html>

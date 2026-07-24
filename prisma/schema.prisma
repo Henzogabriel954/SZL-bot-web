@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+model Suggestion {
+  id            Int       @id @default(autoincrement())
+  authorId      String    // Discord User ID of the author
+  authorTag     String    // Discord User Tag (username) of the author
+  content       String    // The suggestion text (code ideas, project suggestion)
+  messageId     String?   @unique // Discord Message ID in the suggestion channel
+  channelId     String?   // Discord Channel ID where the suggestion message is sent
+  status        String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  threadId      String?   // ID do canal de thread de discussão criado no Discord
+  resolvedBy    String?   // Nome do moderador que aprovou/rejeitou pelo site
+  resolvedNotes String?   // Motivo/Observação do moderador
+  resolvedAt    DateTime? // Data de resolução
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  votes         Vote[]
+}
+
+model Vote {
+  id           Int        @id @default(autoincrement())
+  suggestionId Int
+  suggestion   Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  userId       String     // Discord User ID of the voter
+  type         String     // SUPPORT or REJECT
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([suggestionId, userId]) // Enforce one vote per user per suggestion
+}
+
+model GuildConfig {
+  guildId             String   @id
+  defaultChannelId    String?  // ID do canal principal de avisos
+  customChannelId     String?  // ID do canal de changelogs/novidades
+  suggestionChannelId String?  // ID do canal de sugestões (Opcional)
+  githubRepo          String?  // Repositório do GitHub do servidor (ex: szl-dev/projeto)
+  statusTemplate      String?  // Template de status personalizado para o bot
+  updatedAt           DateTime @updatedAt
+}
